@@ -1,6 +1,6 @@
 package com.shirs.agileboot.modules.system.controller;
 
-    import com.shirs.agileboot.modules.system.entity.ReplaceString;
+import com.shirs.agileboot.modules.system.entity.ReplaceString;
     import com.shirs.agileboot.modules.system.service.UserService;
     import io.swagger.annotations.Api;
     import io.swagger.annotations.ApiOperation;

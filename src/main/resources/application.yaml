@@ -6,7 +6,9 @@ spring:
     password: 970226
     url: jdbc:mysql://localhost:3306/agile-boot?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&nullCatalogMeansCurrent=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    #type: com.alibaba.druid.pool.DruidDataSource
+  aop:
+    auto: true
+  #type: com.alibaba.druid.pool.DruidDataSource
   #activiti:
     #表示启动时检查数据库表，不存在则创建
     #database-schema: true

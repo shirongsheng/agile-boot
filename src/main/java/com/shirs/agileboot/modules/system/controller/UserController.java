@@ -1,5 +1,8 @@
 package com.shirs.agileboot.modules.system.controller;
 
+import com.shirs.agileboot.annotation.OperationLogDetail;
+import com.shirs.agileboot.enums.OperationType;
+import com.shirs.agileboot.enums.OperationUnit;
 import com.shirs.agileboot.modules.system.entity.User;
 import com.shirs.agileboot.modules.system.entity.UserVo;
 import com.shirs.agileboot.modules.system.service.UserService;
@@ -28,6 +31,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ApiOperation(value = "注册",notes = "注册")
+    @OperationLogDetail(detail = "通过手机号[{{tel}}]获取用户名",level = 3,operationUnit = OperationUnit.USER,operationType = OperationType.SELECT)
     public String registerUser(@RequestBody User user){
         int insert = userService.insert(user);
         return "注册成功";

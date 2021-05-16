@@ -1,5 +1,7 @@
 package com.shirs.agileboot.modules.system.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.shirs.agileboot.annotation.OperationLogDetail;
 import com.shirs.agileboot.enums.OperationType;
 import com.shirs.agileboot.enums.OperationUnit;
@@ -11,6 +13,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -37,4 +41,12 @@ public class UserController {
         return "注册成功";
     }
 
+    @PostMapping("/deleteBatch")
+    @ApiOperation(value = "删除",notes = "删除")
+    @OperationLogDetail(detail = "删除用户",level = 3,operationUnit = OperationUnit.USER,operationType = OperationType.DELETE)
+    public int registerUser(@RequestBody JSONObject params){
+        ArrayList list = (ArrayList) params.get("ids");
+        int i = userService.deleteBatch(list);
+        return i;
+    }
 }

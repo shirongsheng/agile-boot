@@ -116,4 +116,11 @@
         where name = #{username}
     </select>
 
+    <delete id="deleteBatch" parameterType="java.util.List">
+        delete from user
+        where id IN
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

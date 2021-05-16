@@ -29,4 +29,9 @@ public class UserServiceImpl implements UserService {
     public int insert(User user) {
         return userMapper.insert(user);
     }
+
+    @Override
+    public int deleteBatch(List ids) {
+        return userMapper.deleteBatch(ids);
+    }
 }

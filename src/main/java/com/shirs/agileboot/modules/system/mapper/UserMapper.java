@@ -21,4 +21,6 @@ public interface UserMapper {
     List<UserVo> userList(User user);
 
     UserVo selectUser(String username);
+
+    int deleteBatch(List ids);
 }

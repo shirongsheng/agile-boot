@@ -1,11 +1,12 @@
 package com.shirs.agileboot.model;
 
+import com.shirs.agileboot.common.page.PageRequest;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class OperationLog {
+public class OperationLog extends PageRequest {
     private String id;
 
     private Date createTime;

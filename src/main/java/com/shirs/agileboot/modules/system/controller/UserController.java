@@ -3,6 +3,8 @@ package com.shirs.agileboot.modules.system.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.shirs.agileboot.annotation.OperationLogDetail;
+import com.shirs.agileboot.common.page.PageRequest;
+import com.shirs.agileboot.common.page.PageResult;
 import com.shirs.agileboot.enums.OperationType;
 import com.shirs.agileboot.enums.OperationUnit;
 import com.shirs.agileboot.modules.system.entity.User;
@@ -12,8 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,5 +48,10 @@ public class UserController {
         ArrayList list = (ArrayList) params.get("ids");
         int i = userService.deleteBatch(list);
         return i;
+    }
+
+    @PostMapping(value="/findPage")
+    public PageResult findPage(@RequestBody User user) {
+        return userService.findPage(user);
     }
 }

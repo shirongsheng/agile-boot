@@ -23,4 +23,10 @@ public interface UserMapper {
     UserVo selectUser(String username);
 
     int deleteBatch(List ids);
+
+    /**
+     * 分页查询用户
+     * @return
+     */
+    List<UserVo> selectPage(User user);
 }

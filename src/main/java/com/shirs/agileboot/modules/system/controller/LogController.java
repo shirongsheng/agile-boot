@@ -1,5 +1,6 @@
 package com.shirs.agileboot.modules.system.controller;
 
+import com.shirs.agileboot.common.page.PageResult;
 import com.shirs.agileboot.model.OperationLog;
 import com.shirs.agileboot.modules.system.service.LogService;
 import io.swagger.annotations.Api;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/log")
@@ -22,9 +21,7 @@ public class LogController {
 
     @PostMapping("/list")
     @ApiOperation(value = "日志列表",notes = "日志列表")
-    public List<OperationLog> queryList(@RequestBody OperationLog operationLog){
-
+    public PageResult queryList(@RequestBody OperationLog operationLog){
         return logService.logList(operationLog);
-
     }
 }

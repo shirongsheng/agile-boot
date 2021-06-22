@@ -34,4 +34,9 @@ public class LogServiceImpl implements LogService {
         PageResult pageResult = PageUtils.getPageResult(operationLog, operationLogPageInfo);
         return pageResult;
     }
+
+    @Override
+    public List<OperationLog> list(OperationLog operationLog) {
+        return logMapper.logList(operationLog);
+    }
 }

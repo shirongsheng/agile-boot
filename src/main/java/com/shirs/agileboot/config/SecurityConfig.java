@@ -7,6 +7,10 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.shirs.agileboot.jwt.JwtAccessDeniedHandler;
+import com.shirs.agileboot.jwt.JwtAuthenticationEntryPoint;
+import com.shirs.agileboot.jwt.JwtAuthenticationTokenFilter;
+import com.shirs.agileboot.jwt.JwtTokenUtils;
 import com.shirs.agileboot.modules.system.securityService.MyPasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,6 +32,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
@@ -42,8 +48,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  * https://blog.csdn.net/weixin_36451151/article/details/83868891
  * 查找了很多文件，有用的还有有的，感谢他们的辛勤付出
  * Security配置文件，项目启动时就加载了
- * @author 程就人生
  *
+ * @author 程就人生
  */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -57,20 +63,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private JwtTokenUtils jwtTokenUtil;
+
+    private JwtAccessDeniedHandler jwtAccessDeniedHandler = null;
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = null;
+    private JwtTokenUtils jwtTokenUtils = null;
+
+    public SecurityConfig(JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtTokenUtils jwtTokenUtils) {
+
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtTokenUtils = jwtTokenUtils;
+
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http
-                .authenticationProvider(authenticationProvider())
+        http.authenticationProvider(authenticationProvider())
                 .httpBasic()
                 //未登录时，进行json格式的提示，很喜欢这种写法，不用单独写一个又一个的类
-                .authenticationEntryPoint((request,response,authException) -> {
+                .authenticationEntryPoint((request, response, authException) -> {
                     response.setContentType("application/json;charset=utf-8");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     PrintWriter out = response.getWriter();
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put("code",403);
-                    map.put("message","未登录");
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", 403);
+                    map.put("message", "未登录");
                     out.write(objectMapper.writeValueAsString(map));
                     out.flush();
                     out.close();
@@ -91,29 +111,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login")
                 .permitAll()
                 //登录失败，返回json
-                .failureHandler((request,response,ex) -> {
+                .failureHandler((request, response, ex) -> {
                     response.setContentType("application/json;charset=utf-8");
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     PrintWriter out = response.getWriter();
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put("code",401);
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", 401);
                     if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException) {
-                        map.put("message","用户名或密码错误");
+                        map.put("message", "用户名或密码错误");
                     } else if (ex instanceof DisabledException) {
-                        map.put("message","账户被禁用");
+                        map.put("message", "账户被禁用");
                     } else {
-                        map.put("message","登录失败!");
+                        map.put("message", "登录失败!");
                     }
                     out.write(objectMapper.writeValueAsString(map));
                     out.flush();
                     out.close();
                 })
                 //登录成功，返回json
-                .successHandler((request,response,authentication) -> {
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put("code",200);
-                    map.put("message","登录成功");
-                    map.put("data",authentication);
+                .successHandler((request, response, authentication) -> {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    String token = jwtTokenUtil.createToken(new HashMap<>());
+                    map.put("code", 200);
+                    map.put("message", "登录成功");
+                    map.put("data", authentication);
+                    map.put("token","Bearer "+token);
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
                     out.write(objectMapper.writeValueAsString(map));
@@ -123,12 +145,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 //没有权限，返回json
-                .accessDeniedHandler((request,response,ex) -> {
+                .accessDeniedHandler((request, response, ex) -> {
                     response.setContentType("application/json;charset=utf-8");
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     PrintWriter out = response.getWriter();
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put("code",403);
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", 403);
                     map.put("message", "权限不足");
                     out.write(objectMapper.writeValueAsString(map));
                     out.flush();
@@ -137,11 +159,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 //退出成功，返回json
-                .logoutSuccessHandler((request,response,authentication) -> {
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put("code",200);
-                    map.put("message","退出成功");
-                    map.put("data",authentication);
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    Map<String, Object> map = new HashMap<String, Object>();
+                    map.put("code", 200);
+                    map.put("message", "退出成功");
+                    map.put("data", authentication);
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
                     out.write(objectMapper.writeValueAsString(map));
@@ -154,7 +176,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors();
 
         //开启模拟请求，比如API POST测试工具的测试，不开启时，API POST为报403错误
-        http.csrf().disable();
+        http.csrf().disable()
+                // 授权异常
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler);
+
+        // 禁用缓存
+        http.headers().cacheControl();
+
+        // 添加JWT filter
+        http.apply(new TokenConfigurer(jwtTokenUtils));
     }
 
     @Override
@@ -172,7 +204,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return authenticationProvider;
     }
 
+    public class TokenConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
+        private final JwtTokenUtils jwtTokenUtils;
 
+        public TokenConfigurer(JwtTokenUtils jwtTokenUtils) {
+
+            this.jwtTokenUtils = jwtTokenUtils;
+        }
+
+        @Override
+        public void configure(HttpSecurity http) {
+            JwtAuthenticationTokenFilter customFilter = new JwtAuthenticationTokenFilter(jwtTokenUtils);
+            http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
+        }
+    }
 }
 

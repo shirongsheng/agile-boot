@@ -1,4 +1,4 @@
-package com.shirs.agileboot.modules.study.DesignPatterns.Singlton;
+package com.shirs.agileboot.modules.study.DesignPatterns.singlton;
 
 public class Singlton_v2 {
 

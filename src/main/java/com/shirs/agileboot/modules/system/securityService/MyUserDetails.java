@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * 实现了UserDetails接口，只留必需的属性，也可添加自己需要的属性
- * @author 程就人生
  *
  */
 @Data

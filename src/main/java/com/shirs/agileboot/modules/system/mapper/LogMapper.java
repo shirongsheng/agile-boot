@@ -10,4 +10,6 @@ public interface LogMapper {
     int insertSelective(OperationLog operationLog);
 
     List<OperationLog> logList(OperationLog operationLog);
+
+    List<OperationLog> allLogList();
 }

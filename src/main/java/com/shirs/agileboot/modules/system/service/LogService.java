@@ -11,5 +11,5 @@ public interface LogService {
 
     PageResult logList(OperationLog operationLog);
 
-    List<OperationLog> list(OperationLog operationLog);
+    List<OperationLog> list();
 }

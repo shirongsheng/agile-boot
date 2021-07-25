@@ -36,7 +36,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
-    public List<OperationLog> list(OperationLog operationLog) {
-        return logMapper.logList(operationLog);
+    public List<OperationLog> list() {
+        return logMapper.allLogList();
     }
 }

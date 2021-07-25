@@ -19,5 +19,24 @@ public class PrototypeTest {
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
+
+
+        System.out.println("---------------------------");
+        try {
+            //创建一个原始对象并添加一个名字
+            DeepClone originalObject = new DeepClone();
+            originalObject.addName("yasuo");
+
+            //克隆一个新对象并添加一个名字
+            DeepClone cloneObject = originalObject.deepClone();
+            cloneObject.addName("timo");
+
+            //打印原始对象和新对象的name
+            originalObject.printNames();
+            System.out.println("-----------");
+            cloneObject.printNames();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

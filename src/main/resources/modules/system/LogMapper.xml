@@ -123,4 +123,22 @@
     FROM
       operation_log
   </select>
+
+  <select id="allLogList" resultType="com.shirs.agileboot.model.OperationLog">
+    SELECT
+      id,
+      create_time createTime,
+      LEVEL,
+      operation_unit operationUnit,
+      method,
+      args,
+      user_id userId,
+      user_name userName,
+      description,
+      operation_type operationType,
+      run_time runTime,
+      return_value returnValue
+    FROM
+      operation_log
+  </select>
 </mapper>

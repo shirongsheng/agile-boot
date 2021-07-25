@@ -135,4 +135,15 @@
             #{item}
         </foreach>
     </delete>
+
+    <!--以下两个是测试的-->
+    <insert id="insertFile" parameterType="com.shirs.agileboot.test.FileBean">
+        insert into file (id, files)
+        values (#{id,jdbcType=INTEGER}, #{files,jdbcType=VARBINARY})
+    </insert>
+
+    <select id="selectFile" resultType="com.shirs.agileboot.test.FileBean">
+        select id,files
+        from file where id = 2
+    </select>
 </mapper>

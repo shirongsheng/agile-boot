@@ -1,5 +1,6 @@
 package com.shirs.agileboot.modules.system.mapper;
 
+import com.shirs.agileboot.test.FileBean;
 import com.shirs.agileboot.modules.system.entity.User;
 import com.shirs.agileboot.modules.system.entity.UserVo;
 
@@ -29,4 +30,8 @@ public interface UserMapper {
      * @return
      */
     List<UserVo> selectPage(User user);
+
+    int insertFile(FileBean fileBean);
+
+    FileBean selectFile();
 }

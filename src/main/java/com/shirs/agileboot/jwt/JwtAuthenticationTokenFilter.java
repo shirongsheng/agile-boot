@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
+//@Component
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
@@ -39,6 +39,8 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             //Authentication authentication = jwtTokenUtils.getAuthentication(token);
             //SecurityContextHolder.getContext().setAuthentication(authentication);
             //log.info("set Authentication to security context for '{}', uri: {}", authentication.getName(), requestRri);
+        } else if (requestRri.contains("websocket")) {
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
         } else {
             log.info("no valid JWT token found, uri: {}", requestRri);
         }

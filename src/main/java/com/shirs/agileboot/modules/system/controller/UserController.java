@@ -35,7 +35,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ApiOperation(value = "注册",notes = "注册")
-    @OperationLogDetail(detail = "通过手机号[{{tel}}]获取用户名",level = 3,operationUnit = OperationUnit.USER,operationType = OperationType.SELECT)
+    @OperationLogDetail(detail = "注册用户",level = 3,operationUnit = OperationUnit.USER,operationType = OperationType.INSERT)
     public String registerUser(@RequestBody User user){
         int insert = userService.insert(user);
         return "注册成功";

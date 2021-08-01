@@ -1,4 +1,4 @@
-package com.shirs.agileboot.utils;
+package com.shirs.agileboot.common.utils;
 
 import org.springframework.web.multipart.MultipartFile;
 

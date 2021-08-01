@@ -5,7 +5,7 @@ import com.shirs.agileboot.common.page.PageResult;
 import com.shirs.agileboot.excel.ExcelListener;
 import com.shirs.agileboot.model.OperationLog;
 import com.shirs.agileboot.modules.system.service.LogService;
-import com.shirs.agileboot.utils.FileUtils;
+import com.shirs.agileboot.common.utils.FileUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController

@@ -98,6 +98,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
+                //放行接口
+                .antMatchers("/websocket/*").permitAll()
                 .anyRequest().authenticated() //必须授权才能范围
 
                 .and()
@@ -213,11 +215,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             this.jwtTokenUtils = jwtTokenUtils;
         }
 
-        @Override
+        /*@Override
         public void configure(HttpSecurity http) {
             JwtAuthenticationTokenFilter customFilter = new JwtAuthenticationTokenFilter(jwtTokenUtils);
             http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
-        }
+        }*/
     }
 }
 

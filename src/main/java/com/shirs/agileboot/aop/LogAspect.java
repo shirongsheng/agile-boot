@@ -1,9 +1,12 @@
 package com.shirs.agileboot.aop;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.shirs.agileboot.annotation.OperationLogDetail;
 import com.shirs.agileboot.model.OperationLog;
 import com.shirs.agileboot.modules.system.service.LogService;
+import com.shirs.agileboot.producer.MsgProducer;
+import com.shirs.agileboot.common.utils.DateUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -13,8 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,9 @@ public class LogAspect {
 
     @Autowired
     private LogService logService;
+
+    @Autowired
+    private MsgProducer msgProducer;
 
     /**
      * 此处的切点是注解的方式，也可以用包名的方式达到相同的效果
@@ -65,20 +69,16 @@ public class LogAspect {
     }
 
     private void addOperationLog(JoinPoint joinPoint, Object res, long time){
-
-        SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        //Timestamp.valueOf(simpleDate.format(date))
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         OperationLog operationLog = new OperationLog();
         operationLog.setRunTime(time);
         operationLog.setReturnValue(JSON.toJSONString(res));
         operationLog.setId(UUID.randomUUID().toString());
         operationLog.setArgs(JSON.toJSONString(joinPoint.getArgs()));
-        operationLog.setCreateTime(date);
+        operationLog.setCreateTime(DateUtils.dateTimeStrToDate(DateUtils.getFormatDateTime(new Date())));
         operationLog.setMethod(signature.getDeclaringTypeName() + "." + signature.getName());
-        operationLog.setUserId("#{currentUserId}");
-        operationLog.setUserName("#{currentUserName}");
+        operationLog.setUserId("admin(还是写死的)");
+        operationLog.setUserName("admin(还是写死的)");
         OperationLogDetail annotation = signature.getMethod().getAnnotation(OperationLogDetail.class);
         if(annotation != null){
             operationLog.setLevel(annotation.level());
@@ -86,8 +86,11 @@ public class LogAspect {
             operationLog.setOperationType(annotation.operationType().getValue());
             operationLog.setOperationUnit(annotation.operationUnit().getValue());
         }
-        logger.info("记录日志:" + operationLog.toString());
-        logService.insert(operationLog);
+        //logService.insert(operationLog);
+        //发送消息到mq
+        JSONObject content = (JSONObject) JSON.toJSON(operationLog);
+        msgProducer.sendMsg(content);
+
     }
 
     /**

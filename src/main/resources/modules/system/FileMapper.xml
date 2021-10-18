@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shirs.agileboot.modules.system.mapper.FileMapper">
+    <resultMap id="BaseResultMap" type="com.shirs.agileboot.modules.system.entity.FileVo">
+        <result column="file_id" jdbcType="VARCHAR" property="fileId"/>
+        <result column="file_name" jdbcType="VARCHAR" property="fileName"/>
+        <result column="files" jdbcType="VARCHAR" property="files"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <select id="fileList" resultType="com.shirs.agileboot.modules.system.entity.FileVo">
+        SELECT
+            file_id     fileId,
+            file_name   fileName,
+            files       files,
+            create_time createTime
+        FROM
+            file
+    </select>
+
+    <select id="selectByFileId" resultType="com.shirs.agileboot.modules.system.entity.FileVo">
+        SELECT
+            file_id     fileId,
+            file_name   fileName,
+            files       files,
+            create_time createTime
+        FROM
+            file where file_id = #{fileId}
+    </select>
+
+    <insert id="insert" parameterType="com.shirs.agileboot.modules.system.entity.FileVo">
+        insert into file
+        (file_id,
+         file_name,
+         files,
+         create_time)
+        values (#{fileId,jdbcType=VARCHAR},
+                #{fileName,jdbcType=VARCHAR},
+                #{files,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP})
+    </insert>
+</mapper>

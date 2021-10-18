@@ -6,6 +6,8 @@ public enum OperationUnit {
      */
     UNKNOWN("unknown"),
     USER("user"),
+    ALARMFILE("alarmFile"),
+    DOWNLOAD("downLoad"),
     EMPLOYEE("employee"),
     Redis("redis");
 

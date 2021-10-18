@@ -10,7 +10,8 @@ public enum OperationType {
     DELETE("delete"),
     SELECT("select"),
     UPDATE("update"),
-    INSERT("insert");
+    INSERT("insert"),
+    DOWNLOAD("download");
 
     private String value;
 

@@ -11,11 +11,11 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   aop:
     auto: true
-  rabbitmq:
-    host: 127.0.0.1
-    port: 5672
-    username: guest
-    password: guest
+  #rabbitmq:
+    #host: 127.0.0.1
+    #port: 5672
+    #username: guest
+    #password: guest
 mybatis:
   mapper-locations: classpath:modules/*/*.xml
 

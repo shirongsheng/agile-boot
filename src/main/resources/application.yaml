@@ -11,6 +11,15 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   aop:
     auto: true
+  flyway:
+    locations:
+      - classpath:db/migration
+    #如果数据库不是空表，需要设置为true，否则启动报错
+    baseline-on-migrate: true
+    encoding: UTF-8
+    #校验
+    validate-on-migrate: true
+    clean-disabled: false
   #rabbitmq:
     #host: 127.0.0.1
     #port: 5672

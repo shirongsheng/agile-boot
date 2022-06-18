@@ -45,3 +45,5 @@ jwt:
   # 令牌过期时间 此处单位/毫秒
   token-validity-in-seconds: 600000
 
+logging:
+  config: classpath:logback-spring.xml

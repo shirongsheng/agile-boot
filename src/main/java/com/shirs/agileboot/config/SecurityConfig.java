@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.shirs.agileboot.common.constant.AgileConstant;
 import com.shirs.agileboot.jwt.JwtAccessDeniedHandler;
 import com.shirs.agileboot.jwt.JwtAuthenticationEntryPoint;
 import com.shirs.agileboot.jwt.JwtAuthenticationTokenFilter;
@@ -119,7 +120,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     Map<String, Object> map = new HashMap<String, Object>();
                     map.put("code", 401);
                     if (ex instanceof UsernameNotFoundException || ex instanceof BadCredentialsException) {
-                        map.put("message", "用户名或密码错误");
+                        map.put("message", AgileConstant.USERNMAE_OR_PASSWORD_ERROR);
                     } else if (ex instanceof DisabledException) {
                         map.put("message", "账户被禁用");
                     } else {
@@ -136,7 +137,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     map.put("code", 200);
                     map.put("message", "登录成功");
                     map.put("data", authentication);
-                    map.put("token","Bearer "+token);
+                    map.put("token", "Bearer " + token);
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
                     out.write(objectMapper.writeValueAsString(map));

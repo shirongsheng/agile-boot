@@ -1,6 +1,5 @@
 package com.shirs.agileboot.modules.system.service;
 
-import com.shirs.agileboot.common.page.PageRequest;
 import com.shirs.agileboot.common.page.PageResult;
 import com.shirs.agileboot.modules.system.entity.User;
 import com.shirs.agileboot.modules.system.entity.UserVo;

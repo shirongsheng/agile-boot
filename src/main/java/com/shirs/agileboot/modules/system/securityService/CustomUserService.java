@@ -1,20 +1,18 @@
 package com.shirs.agileboot.modules.system.securityService;
 
+import com.shirs.agileboot.common.constant.AgileConstant;
 import com.shirs.agileboot.modules.system.entity.UserVo;
 import com.shirs.agileboot.modules.system.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-/**
- * 登录专用类
- * 自定义类，实现了UserDetailsService接口，用户登录时调用的第一类
- * @author 程就人生
- *
- */
+
+@Slf4j
 @Component
-public class MyCustomUserService implements UserDetailsService {
+public class CustomUserService implements UserDetailsService {
 
     @Autowired
     private UserService userService;
@@ -27,6 +25,11 @@ public class MyCustomUserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         UserVo userVo = userService.selectUser(username);
+
+        if (null == userVo) {
+            log.info(AgileConstant.USER_NOT_EXIST);
+            throw new UsernameNotFoundException(AgileConstant.USERNMAE_OR_PASSWORD_ERROR);
+        }
 
         MyUserDetails myUserDetail = new MyUserDetails();
         myUserDetail.setUsername(userVo.getName());

@@ -1,17 +1,13 @@
 package com.shirs.agileboot.config;
 
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import com.shirs.agileboot.common.constant.AgileConstant;
-import com.shirs.agileboot.jwt.JwtAccessDeniedHandler;
-import com.shirs.agileboot.jwt.JwtAuthenticationEntryPoint;
-import com.shirs.agileboot.jwt.JwtAuthenticationTokenFilter;
-import com.shirs.agileboot.jwt.JwtTokenUtils;
+import com.shirs.agileboot.common.filter.JwtAuthenticationTokenFilter;
 import com.shirs.agileboot.modules.system.securityService.MyPasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,36 +18,16 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/**
- * 参考网址：
- * https://blog.csdn.net/XlxfyzsFdblj/article/details/82083443
- * https://blog.csdn.net/lizc_lizc/article/details/84059004
- * https://blog.csdn.net/XlxfyzsFdblj/article/details/82084183
- * https://blog.csdn.net/weixin_36451151/article/details/83868891
- * 查找了很多文件，有用的还有有的，感谢他们的辛勤付出
- * Security配置文件，项目启动时就加载了
- *
- * @author 程就人生
- */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -59,24 +35,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private MyPasswordEncoder myPasswordEncoder;
 
     @Autowired
-    private UserDetailsService myCustomUserService;
+    private UserDetailsService userDetailService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private JwtTokenUtils jwtTokenUtil;
+    private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
-    private JwtAccessDeniedHandler jwtAccessDeniedHandler = null;
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint = null;
-    private JwtTokenUtils jwtTokenUtils = null;
-
-    public SecurityConfig(JwtAccessDeniedHandler jwtAccessDeniedHandler, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtTokenUtils jwtTokenUtils) {
-
-        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-        this.jwtTokenUtils = jwtTokenUtils;
-
+    /**
+     * 注入到容器，进行用户认证
+     *
+     * @return
+     * @throws Exception
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
@@ -97,9 +73,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 })
 
                 .and()
+                //不通过session获取SecurityContext，前后端分离禁用session
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
                 //放行接口
+                //对于登录接口，允许匿名访问
+                .antMatchers("/auth/login").anonymous()
+                //.antMatchers("/auth/logout").anonymous()
                 .antMatchers("/websocket/*").permitAll()
+                //除上面外的所有请求全部都需要鉴权认证
                 .anyRequest().authenticated() //必须授权才能范围
 
                 .and()
@@ -133,11 +116,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //登录成功，返回json
                 .successHandler((request, response, authentication) -> {
                     Map<String, Object> map = new HashMap<String, Object>();
-                    String token = jwtTokenUtil.createToken(new HashMap<>());
+                    //String token = jwtTokenUtil.createToken(new HashMap<>());
                     map.put("code", 200);
                     map.put("message", "登录成功");
                     map.put("data", authentication);
-                    map.put("token", "Bearer " + token);
+                    //map.put("token", "Bearer " + token);
                     response.setContentType("application/json;charset=utf-8");
                     PrintWriter out = response.getWriter();
                     out.write(objectMapper.writeValueAsString(map));
@@ -177,18 +160,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //登录时会出现跨域问题。
         http.cors();
 
-        //开启模拟请求，比如API POST测试工具的测试，不开启时，API POST为报403错误
-        http.csrf().disable()
-                // 授权异常
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler);
+        http.csrf().disable();
 
         // 禁用缓存
         http.headers().cacheControl();
 
-        // 添加JWT filter
-        http.apply(new TokenConfigurer(jwtTokenUtils));
+        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
@@ -201,25 +178,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         //对默认的UserDetailsService进行覆盖
-        authenticationProvider.setUserDetailsService(myCustomUserService);
+        authenticationProvider.setUserDetailsService(userDetailService);
         authenticationProvider.setPasswordEncoder(myPasswordEncoder);
         return authenticationProvider;
-    }
-
-    public class TokenConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
-
-        private final JwtTokenUtils jwtTokenUtils;
-
-        public TokenConfigurer(JwtTokenUtils jwtTokenUtils) {
-
-            this.jwtTokenUtils = jwtTokenUtils;
-        }
-
-        /*@Override
-        public void configure(HttpSecurity http) {
-            JwtAuthenticationTokenFilter customFilter = new JwtAuthenticationTokenFilter(jwtTokenUtils);
-            http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
-        }*/
     }
 }
 

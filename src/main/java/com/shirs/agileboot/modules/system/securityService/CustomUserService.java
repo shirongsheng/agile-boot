@@ -1,8 +1,8 @@
 package com.shirs.agileboot.modules.system.securityService;
 
 import com.shirs.agileboot.common.constant.AgileConstant;
-import com.shirs.agileboot.modules.system.entity.UserVo;
-import com.shirs.agileboot.modules.system.service.UserService;
+import com.shirs.agileboot.modules.system.entity.SysUser;
+import com.shirs.agileboot.modules.system.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,12 +10,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Slf4j
 @Component
 public class CustomUserService implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
+    private SysUserService sysUserService;
 
     /**
      * 登陆验证时，通过username获取用户的所有权限信息
@@ -24,16 +26,12 @@ public class CustomUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        UserVo userVo = userService.selectUser(username);
+        SysUser sysUser = sysUserService.selectByUserName(username);
 
-        if (null == userVo) {
+        if (Objects.isNull(sysUser)) {
             log.info(AgileConstant.USER_NOT_EXIST);
             throw new UsernameNotFoundException(AgileConstant.USERNMAE_OR_PASSWORD_ERROR);
         }
-
-        MyUserDetails myUserDetail = new MyUserDetails();
-        myUserDetail.setUsername(userVo.getName());
-        myUserDetail.setPassword(userVo.getPassword());
-        return myUserDetail;
+        return sysUser;
     }
 }

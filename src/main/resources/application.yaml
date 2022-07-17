@@ -28,20 +28,17 @@ spring:
     #port: 5672
     #username: guest
     #password: guest
-mybatis:
-  mapper-locations: classpath:modules/*/*.xml
 
 mybatis-plus:
-  configuration:
+  mapper-locations: classpath:modules/*/*.xml
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      logic-delete-field: is_deleted
+    #configuration:
     # 打印执行的SQL语句及返回的数据
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-# pagehelper
-pagehelper:
-  helperDialect: mysql
-  reasonable: true
-  supportMethodsArguments: true
-  params: count=countSql
+    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 logging:
   config: classpath:logback-spring.xml

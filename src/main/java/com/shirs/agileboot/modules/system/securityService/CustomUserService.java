@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -32,6 +33,9 @@ public class CustomUserService implements UserDetailsService {
             log.info(AgileConstant.USER_NOT_EXIST);
             throw new UsernameNotFoundException(AgileConstant.USERNMAE_OR_PASSWORD_ERROR);
         }
+        //权限
+        List<String> roles = sysUserService.getRolesById(sysUser.getId());
+        sysUser.setPermissions(roles);
         return sysUser;
     }
 }

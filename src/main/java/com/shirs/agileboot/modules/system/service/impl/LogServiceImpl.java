@@ -5,7 +5,6 @@ import com.github.pagehelper.PageInfo;
 import com.shirs.agileboot.common.page.PageResult;
 import com.shirs.agileboot.common.utils.PageUtils;
 import com.shirs.agileboot.model.OperationLog;
-import com.shirs.agileboot.modules.system.entity.UserVo;
 import com.shirs.agileboot.modules.system.mapper.LogMapper;
 import com.shirs.agileboot.modules.system.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;

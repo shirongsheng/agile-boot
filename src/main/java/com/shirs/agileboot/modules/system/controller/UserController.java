@@ -1,20 +1,15 @@
 package com.shirs.agileboot.modules.system.controller;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.shirs.agileboot.annotation.OperationLogDetail;
-import com.shirs.agileboot.common.page.PageRequest;
-import com.shirs.agileboot.common.page.PageResult;
-import com.shirs.agileboot.enums.OperationType;
-import com.shirs.agileboot.enums.OperationUnit;
-import com.shirs.agileboot.modules.system.entity.User;
-import com.shirs.agileboot.modules.system.entity.UserVo;
-import com.shirs.agileboot.modules.system.service.UserService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.shirs.agileboot.common.page.ResponseResult;
+import com.shirs.agileboot.modules.system.entity.SysUser;
+import com.shirs.agileboot.modules.system.service.SysUserService;
+import com.shirs.agileboot.modules.system.vo.UserQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
+
 import java.util.List;
 
 @RestController
@@ -23,17 +18,17 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private SysUserService userService;
 
     @PostMapping("/list")
-    @ApiOperation(value = "列表",notes = "列表")
-    public List<UserVo> queryList(@RequestBody User user){
+    @ApiOperation(value = "列表", notes = "列表")
+    public List<SysUser> queryList() {
 
-        return userService.userList(user);
+        return userService.userList();
 
     }
 
-    @PostMapping("/register")
+    /*@PostMapping("/register")
     @ApiOperation(value = "注册",notes = "注册")
     @OperationLogDetail(detail = "注册用户",level = 3,operationUnit = OperationUnit.USER,operationType = OperationType.INSERT)
     public String registerUser(@RequestBody User user){
@@ -48,10 +43,11 @@ public class UserController {
         ArrayList list = (ArrayList) params.get("ids");
         int i = userService.deleteBatch(list);
         return i;
-    }
+    }*/
 
-    @PostMapping(value="/findPage")
-    public PageResult findPage(@RequestBody User user) {
-        return userService.findPage(user);
+    @PostMapping(value = "/findPage")
+    public ResponseResult findPage(@RequestBody UserQueryVo userQueryVo) {
+        IPage<SysUser> page = userService.findPage(userQueryVo);
+        return new ResponseResult(200, "success", page);
     }
 }

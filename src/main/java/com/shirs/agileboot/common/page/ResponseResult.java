@@ -1,6 +1,7 @@
 package com.shirs.agileboot.common.page;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.shirs.agileboot.exception.BaseErrorInfoInterface;
 import lombok.Data;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -19,6 +20,16 @@ public class ResponseResult<T> {
      */
     private T data;
 
+    public ResponseResult() {
+
+    }
+
+    public ResponseResult(T data) {
+        this.data = data;
+        this.code = 200;
+        this.msg = "success";
+    }
+
     public ResponseResult(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
@@ -33,5 +44,22 @@ public class ResponseResult<T> {
         this.code = code;
         this.msg = msg;
         this.data = data;
+    }
+
+    public ResponseResult success(T data) {
+        return new ResponseResult(data);
+    }
+
+    public ResponseResult(BaseErrorInfoInterface errorInfoInterface) {
+        this.code = errorInfoInterface.getResultCode();
+        this.msg = errorInfoInterface.getResultMsg();
+    }
+
+    public static ResponseResult error(BaseErrorInfoInterface errorInfo) {
+        return new ResponseResult(errorInfo.getResultCode(), errorInfo.getResultMsg());
+    }
+
+    public static ResponseResult error(Integer code, String msg) {
+        return new ResponseResult(code, msg);
     }
 }

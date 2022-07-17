@@ -1,5 +1,6 @@
 package com.shirs.agileboot.exception;
 
+import com.shirs.agileboot.common.page.ResponseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,9 +21,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = BizException.class)
     @ResponseBody
-    public  ResultBody bizExceptionHandler(HttpServletRequest req, BizException e){
+    public  ResponseResult bizExceptionHandler(HttpServletRequest req, BizException e){
         logger.error("发生业务异常！原因是：{}",e.getErrorMsg());
-        return ResultBody.error(e.getErrorCode(),e.getErrorMsg());
+        return ResponseResult.error(e.getErrorCode(),e.getErrorMsg());
     }
 
     /**
@@ -33,9 +34,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value =NullPointerException.class)
     @ResponseBody
-    public ResultBody exceptionHandler(HttpServletRequest req, NullPointerException e){
+    public ResponseResult exceptionHandler(HttpServletRequest req, NullPointerException e){
         logger.error("发生空指针异常！原因是:",e);
-        return ResultBody.error(CommonEnum.BODY_NOT_MATCH);
+        return ResponseResult.error(CommonEnum.NULL_POINT);
     }
 
 
@@ -47,8 +48,8 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value =Exception.class)
     @ResponseBody
-    public ResultBody exceptionHandler(HttpServletRequest req, Exception e){
+    public ResponseResult exceptionHandler(HttpServletRequest req, Exception e){
         logger.error("未知异常！原因是:",e);
-        return ResultBody.error(CommonEnum.INTERNAL_SERVER_ERROR);
+        return ResponseResult.error(CommonEnum.INTERNAL_SERVER_ERROR);
     }
 }

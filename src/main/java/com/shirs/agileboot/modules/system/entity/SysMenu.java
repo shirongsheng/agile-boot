@@ -1,5 +1,7 @@
 package com.shirs.agileboot.modules.system.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Tolerate;
@@ -15,21 +17,43 @@ public class SysMenu {
 
     }
 
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     private String menuName;
 
-    private String path;
+    /**
+     * 父菜单id
+     */
+    private Long parentId;
 
-    private String component;
-
-    private String visible;
-
-    private String status;
-
-    private String perms;
+    /**
+     * 1文件夹 2页面 3按钮
+     */
+    private Integer nodeType;
 
     private String icon;
+
+    /**
+     * 排序号
+     */
+    private Integer sort;
+
+
+    /**
+     * 页面对应的地址
+     */
+    private String linkUrl;
+
+    /**
+     * 层次
+     */
+    private Integer level;
+
+    /**
+     * 树id的路径，整个层次上的路径id
+     */
+    private String path;
 
     private Long create_by;
 
@@ -39,7 +63,5 @@ public class SysMenu {
 
     private Date update_time;
 
-    private Integer del_flag;
-
-    private String remark;
+    private Integer isDelete;
 }

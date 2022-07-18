@@ -27,7 +27,9 @@ public class CustomSecurityMetadataSource
                 ((FilterInvocation) object).getRequest().getRequestURI();
         List<SysMenuRolesVo> allMenu = menuService.getMenuRoles();
         for (SysMenuRolesVo menu : allMenu) {
-            if (antPathMatcher.match(menu.getSysMenu().getPath(), requestURI)) {
+            String path = menu.getSysMenu().getPath();
+            if (path != null
+                    && antPathMatcher.match(path, requestURI)) {
                 String[] roles = menu.getRoles().stream()
                         .map(r -> r.getName()).toArray(String[]::new);
                 return SecurityConfig.createList(roles);

@@ -45,6 +45,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Autowired
     private SysRoleService roleService;
 
+    private SysUser user;
+
     @Override
     public SysUser selectByUserName(String username) {
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
@@ -116,5 +118,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 .collect(Collectors.toList());
 
         return roleNames;
+    }
+
+    @Override
+    public SysUser getUser() {
+
+        return user;
+    }
+
+    @Override
+    public void setUser(SysUser user) {
+        this.user = user;
     }
 }

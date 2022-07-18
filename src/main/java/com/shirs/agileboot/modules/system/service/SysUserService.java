@@ -21,4 +21,8 @@ public interface SysUserService extends IService<SysUser> {
     IPage<SysUser> findPage(UserQueryVo userQueryVo);
 
     List<String> getRolesById(Long userId);
+
+    SysUser getUser();
+
+    void setUser(SysUser user);
 }

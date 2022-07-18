@@ -5,6 +5,7 @@ import com.shirs.agileboot.common.utils.JwtUtils;
 import com.shirs.agileboot.common.utils.WebUtils;
 import com.shirs.agileboot.config.RedisCache;
 import com.shirs.agileboot.modules.system.entity.SysUser;
+import com.shirs.agileboot.modules.system.service.SysUserService;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +32,9 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private SysUserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -66,6 +70,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (Objects.isNull(loginUser)) {
             throw new RuntimeException("用户未登录");
         }
+        userService.setUser(loginUser);
         //存入SecurityContextHolder
         //TODO 获取权限信息封装到Authentication中
         UsernamePasswordAuthenticationToken authenticationToken =
